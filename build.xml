@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+
+<project name="convertdoc" default="compile" basedir=".">
+
+  <!-- set global properties for this build -->
+  <property name="src"       value="src"/>
+  <property name="build"     value="build"/>
+  <property name="lib"       value="lib"/>
+  <property name="dist"      value="lib"/>
+  <property name="jar"       value="${dist}/convertdoc.jar"/>
+  <property name="docs"      value="docs"/>
+  <property name="include"   value="${lib}"/>
+  <property name="package"   value="edu.nyu.dlib.ptv.convertdoc"/>
+  <property name="runclass"  value="${package}.ConvertDocument"/>
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp>
+      <format property="timestamp" pattern="yyyyMMdd-HHmmss-z"/>
+    </tstamp>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+    <!-- Create the directory for the java docs -->
+    <mkdir dir="${docs}"/>
+
+    <!-- Define the classpaths -->
+    <path id="compile.classpath">
+      <!-- include all jar files  -->
+      <fileset dir="${include}">
+        <include name="**/*.jar"/>
+      </fileset>
+    </path>
+    <path id="run.classpath">
+      <path refid="compile.classpath"/>
+      <pathelement path="${build}"/>
+    </path>
+    <pathconvert property="jar.classpath"
+                 dirsep="/"
+                 pathsep=" "
+                 refid="compile.classpath">
+      <map from="${basedir}${file.separator}lib${file.separator}" to=""/>
+    </pathconvert>
+  </target>
+
+  <target name="compile" depends="init">
+    <!-- Compile the java code -->
+    <javac srcdir="${src}" destdir="${build}">
+      <classpath refid="compile.classpath"/>
+    </javac>
+  </target>
+
+  <target name="docs" depends="compile">
+    <!-- create javadocs -->
+    <javadoc packagenames="${package}.*"
+             sourcepath="${build}"
+             defaultexcludes="yes"
+             destdir="${docs}"
+             author="true"
+             version="true"
+             use="true"
+             windowtitle="ConvertDocument Documentation Version: ${version}">
+     </javadoc>
+  </target>
+
+  <target name="run" depends="compile">
+    <!-- run the class -->
+    <java classname="${runclass}">
+      <classpath refid="run.classpath"/>
+    </java>
+  </target>
+
+  <target name="dist" depends="compile"
+        description="generate the distribution" >
+
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}"/>
+
+    <property name="buildid" value="${timestamp} (${user.name} [${os.name} ${os.version} ${os.arch}])"/>
+
+    <!-- Put everything in ${build} into the ${jar} file -->
+    <jar jarfile="${jar}" basedir="${build}">
+      <manifest>
+        <attribute name="Main-Class" value="${runclass}"/>
+        <attribute name="Class-Path" value="${jar.classpath}"/>
+        <attribute name="Build-Id" value="${buildid}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="clean" description="clean up">
+    <!-- Delete the ${build} directory tree -->
+    <delete dir="${build}"/>
+  </target>
+
+</project>

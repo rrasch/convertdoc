@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# Wrapper script to ConvertDocument java program
+
+
+# convertdoc installation location
+CONVERTDOC_HOME=/usr/local/dlib/convertdoc
+
+# document registry mapping file formats to openoffice export filters
+DOC_REGISTRY=$CONVERTDOC_HOME/conf/document-formats.xml
+
+# jar file containing main class
+PROG_JAR=$CONVERTDOC_HOME/lib/convertdoc.jar
+
+# run it
+java -jar $PROG_JAR -r $DOC_REGISTRY $*

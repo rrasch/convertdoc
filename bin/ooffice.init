@@ -1,0 +1,36 @@
+#!/bin/bash
+#
+# Start OpenOffice.org as a local service.
+
+OLD_PATH=$PATH
+PATH="/opt/openoffice.org3/program"
+PATH="$PATH:/cygdrive/c/Program Files/OpenOffice.org 3/program"
+PATH="$PATH:/cygdrive/c/Program Files/OpenOffice.org 2.4/program"
+export PATH="$PATH:$OLD_PATH"
+
+unset DISPLAY
+
+start() {
+    soffice -headless -nofirststartwizard \
+        -accept="socket,host=localhost,port=8100;urp" &
+}
+
+stop() {
+    kill `pgrep soffice.bin` >& /dev/null
+}
+
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  restart)
+    stop
+    start
+    ;;
+  *)
+    echo $"Usage: $0 {start|stop|restart}"
+esac
+
